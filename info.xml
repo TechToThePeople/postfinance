@@ -18,4 +18,21 @@
   <civix>
     <namespace>CRM/Postfinance</namespace>
   </civix>
+  <typeInfo>
+   <userNameLabel>PSPID (Postfinance Merchant ID)</userNameLabel>
+   <passwordLabel>Password</passwordLabel>
+   <signatureLabel></signatureLabel>
+   <subjectLabel></subjectLabel>
+   <urlSiteDefault>https://e-payment.postfinance.ch/ncol/prod/orderstandard_utf8.asp</urlSiteDefault>
+   <urlApiDefault></urlApiDefault>
+   <urlRecurDefault></urlRecurDefault>
+   <urlSiteTestDefault>https://e-payment.postfinance.ch/ncol/test/orderstandard_utf8.asp</urlSiteTestDefault>
+   <urlApiTestDefault></urlApiTestDefault>
+   <urlRecurTestDefault></urlRecurTestDefault>
+   <urlButtonDefault></urlButtonDefault>
+   <urlButtonTestDefault></urlButtonTestDefault>
+   <billingMode>notify</billingMode>
+   <isRecur>0</isRecur>
+   <paymentType>1</paymentType>
+  </typeInfo>
 </extension>
