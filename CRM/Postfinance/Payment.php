@@ -171,16 +171,33 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     return $paymentProcessorString;
   }
 
-  /*
-   * map the name / value set required by the payment processor
+  /**
+   * Map the name / value set required by the payment processor.
+   *
    * @param array $params
-   * @return array $processorParams array reflecting parameters required for payment processor
+   *
+   * @return array
+   *   Array reflecting parameters required for payment processor
    */
   function mapParamstoPaymentProcessorFields($params, $component) {
 
     $partner = (empty($this->_paymentProcessor['signature'] )) ? 'PAYPAL' : $this->_paymentProcessor['signature'];
 
     $processorParams = array(
+      'PSID' => '',
+      'ORDERID' => '',
+      'AMOUNT' => '',
+      'CURRENCY' => '',
+      'LANGUAGE' => '',
+      'CN' => '',
+      'EMAIL' => '',
+      'OWNERZIP' => '',
+      'OWNERADDRESS' => '',
+      'OWNERCTY' => '',
+      'OWNERTELNO' => '',
+      'COM' => '',
+
+
       'TYPE'        => 'S',
       'ADDRESS'     => $this->URLencodetoMaximumLength($params['street_address'], 60),
       'CITY'        => $this->URLencodetoMaximumLength($params['city'], 32),

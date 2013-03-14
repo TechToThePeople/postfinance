@@ -1,8 +1,16 @@
-<?xml version="1.0"?>
-<extension key="eu.tttp.postfinance" type="module">
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension key="eu.tttp.postfinance" type="payment">
+
+
   <file>postfinance</file>
   <name>PostFinance</name>
   <description>PostFinance Payment Processor</description>
+  <urls></urls>
+  
+  
+  
+  
+  
   <license>AGPL</license>
   <maintainer>
     <author>Andreas Hennings</author>
@@ -10,11 +18,12 @@
   </maintainer>
   <releaseDate>2013-03-05</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <develStage>Stable</develStage>
   <compatibility>
+    <ver>3.4</ver>
+    <ver>4.1</ver>
     <ver>4.2</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
   <civix>
     <namespace>CRM/Postfinance</namespace>
   </civix>
