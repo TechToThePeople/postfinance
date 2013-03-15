@@ -3,14 +3,17 @@
 
 
   <file>postfinance</file>
-  <name>PostFinance</name>
-  <description>PostFinance Payment Processor</description>
-  <urls></urls>
-  
-  
-  
-  
-  
+  <name>PostFinance Swiss Payment</name>
+  <description>Swiss payment system PostFinance. 
+     Partly funded by TEDx Lausanne. If you are using it, please consider contributing financially to its development too. By all means, feel free to contact us if you need some help for your civicrm project, we are based in Geneva. xavier.dutoit@tttp.eu
+  </description>
+  <downloadUrl>https://github.com/TechToThePeople/eu.tttp.postfinance/archive/master.zip</downloadUrl>
+  <urls>
+    <url desc="Main Extension Page">http://github.com/TechToThePeople/eu.tttp.postfinance</url>
+    <url desc="Documentation">http://github.com/TechToThePeople/eu.tttp.postfinance</url>
+    <url desc="Support">http://forum.civicrm.org</url>
+    <url desc="Licensing">http://civicrm.org/licensing</url>
+  </urls>
   <license>AGPL</license>
   <maintainer>
     <author>Andreas Hennings</author>
@@ -20,9 +23,9 @@
   <version>1.0</version>
   <develStage>Stable</develStage>
   <compatibility>
-    <ver>3.4</ver>
     <ver>4.1</ver>
     <ver>4.2</ver>
+    <ver>4.3</ver>
   </compatibility>
   <civix>
     <namespace>CRM/Postfinance</namespace>
