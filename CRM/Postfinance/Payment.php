@@ -105,19 +105,19 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    *   Name value pair of contribution data
    * @param string $component
    *   Can be either 'contribute' or 'event' or the name of another civicrm component.
-   *  
+   *
    * @return void
    */
   function doTransferCheckout(&$params, $component) {
 
     $cancelURL = $this->getCancelURL($params, $component);
     $component = strtolower($component);
-    $paymentProcessorParams = $this->mapParamstoPaymentProcessorFields($params, $component);
+    $paymentProcessorParams = $this->mapParamsToPaymentProcessorFields($params, $component);
 
     // Allow further manipulation of params via custom hooks
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $paymentProcessorParams);
 
-    $processorURL = $this->_paymentProcessor['url_site'] . "?" . $this->buildPaymentProcessorString($paymentProcessorParams);
+    $processorURL = $this->_paymentProcessor['url_site'] . '?' . $this->urlQueryString($paymentProcessorParams);
     CRM_Utils_System::redirect($processorURL);
   }
 
@@ -153,22 +153,24 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
 
   /**
    * Build string of name value pairs for submission to payment processor
-   * 
+   *
    * @params array $paymentProcessorParams
    *
    * @return string
    *   Payment processor query string
    */
-  function buildPaymentProcessorString($paymentProcessorParams){
-    $validParams = array();
-    foreach ($paymentProcessorParams as $key => $value){
-      if (!empty($value)){
-        $validParams[] = $key ."=".$value;   
+  protected function urlQueryString(array $urlQueryParams) {
+    $pieces = array();
+    foreach ($urlQueryParams as $key => $value){
+      if (!empty($value)) {
+        // We know that the key is safe and doesn't need to be urlencoded.
+        if (!is_numeric($value)) {
+          $value = rawurlencode($value);
+        }
+        $pieces[] = $key . '=' . $value;
       }
     }
-    $paymentProcessorString = implode('&',$validParams);
-
-    return $paymentProcessorString;
+    return implode('&', $pieces);
   }
 
   /**
@@ -179,57 +181,197 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    * @return array
    *   Array reflecting parameters required for payment processor
    */
-  function mapParamstoPaymentProcessorFields($params, $component) {
+  function mapParamsToPaymentProcessorFields($params, $component) {
+    dpm($params, '$params');
+    $obj = new stdClass;
+    foreach ($this as $k => $v) {
+      $obj->$k = $v;
+    }
+    dpm($obj, '$this');
 
     $partner = (empty($this->_paymentProcessor['signature'] )) ? 'PAYPAL' : $this->_paymentProcessor['signature'];
+    $info = $this->_paymentProcessor;
 
+    // Load the config for current language.
+    $config = CRM_Core_Config::singleton();
+    dpm($config, '$config');
+
+    // Load the contact for contact-related information.
+    if (empty($params['contactID'])) {
+      throw new Exception('No contact id given in $params.');
+    }
+    $contact = civicrm_api('Contact', 'get', array(
+      'version' => 3,
+      'id' => $params['contactID'],
+      'return' => array('display_name', 'city', 'email', 'postal_code', 'street_address'),
+    ));
+    if (empty($contact['values'][$params['contactID']])) {
+      throw new Exception('No contact found for id=' . $params['contactID'] . '.');
+    }
+    $contact = $contact['values'][$params['contactID']];
+    dpm($contact, '$contact');
+
+    // Build the params for the url.
     $processorParams = array(
-      'PSID' => '',
-      'ORDERID' => '',
-      'AMOUNT' => '',
-      'CURRENCY' => '',
-      'LANGUAGE' => '',
-      'CN' => '',
-      'EMAIL' => '',
-      'OWNERZIP' => '',
-      'OWNERADDRESS' => '',
-      'OWNERCTY' => '',
-      'OWNERTELNO' => '',
-      'COM' => '',
 
+      // postfinance merchant account name.
+      'PSPID' => $info['user_name'],
+      // order id must be unique.
+      'ORDERID' => $params['contributionID'],
+      'AMOUNT' => $params['amount'],
+      'CURRENCY' => $params['currencyID'],
+      'LANGUAGE' => $config->icMessages,
+
+      // Optional customer details, highly recommended for fraud prevention.
+      // Customer name
+      'CN' => $contact['display_name'],
+      'EMAIL' => $contact['email'],
+      'OWNERZIP' => $contact['postal_code'],
+      'OWNERADDRESS' => $contact['street_address'],
+      'OWNERCTY' => $contact['city'],
+      // Leave tel no empty for privacy.
+      // 'OWNERTELNO' => '',
+
+      // Order description
+      // (will be clipped to maximum length later)
+      'COM' => $params['description'],
+
+      // Look and feel of the payment page. Optional!!
+      // 'TITLE' => '',
+      // ...
+
+      // Dynamic template page. Optional!!
+      // 'TP' => '',
+
+      // Payment method and payment specifics. Optional!!
+      // 'PM' => '',
+      // 'BRAND' => '',
+      // 'WIN3DS' => '',
+      // 'PMLIST' => '',
+      // 'PMLISTTYPE' => '',
+
+      // Link to your website.
+      'HOMEURL' => 'NONE',
+      'CATALOGURL' => 'NONE',
+
+      // Post payment params: Redirection
+      'COMPLUS' => '',
+      'PARAMPLUS' => '',
+
+      // Post payment params: Feedback
+      'PARAMVAR' => '',
+
+      // Post payment redirection
+      'ACCEPTURL' => '',
+      'DECLINEURL' => '',
+      'EXCEPTIONURL' => '',
+      'CANCELURL' => '',
+
+      // Optional operation field.
+      'OPERATION' => '',
+
+      // Optional extra login detail field.
+      'USERID' => '',
+
+      // Alias details
+      'ALIAS' => '',
+      'ALIASUSAGE' => '',
+      'ALIASOPERATION' => '',
+    );
+
+    // Normalize processor params
+    foreach ($processorParams as $k => &$v) {
+      if (!is_numeric($v)) {
+        $v = $this->clipEncodedLength($v);
+      }
+    }
+
+    // hash/sign
+    $processorParams['SHASIGN'] = $this->calculateShaSign($processorParams);
+
+    dpm($processorParams, '$processorParams');
+    return $processorParams;
+
+
+    // Inspirational stuff from PayflowLink, to be removed when we are finished.
+    $processorParams = array(
 
       'TYPE'        => 'S',
-      'ADDRESS'     => $this->URLencodetoMaximumLength($params['street_address'], 60),
-      'CITY'        => $this->URLencodetoMaximumLength($params['city'], 32),
+      'ADDRESS'     => $this->urlEncodeToMaximumLength($params['street_address'], 60),
+      'CITY'        => $this->urlEncodeToMaximumLength($params['city'], 32),
       'LOGIN'       => $this->_paymentProcessor['user_name'],
       'PARTNER'     => $partner,
       'AMOUNT'      => $params['amount'],
-      'ZIP'         => $this->URLencodetoMaximumLength($params['postal_code'], 10),
+      'ZIP'         => $this->urlEncodeToMaximumLength($params['postal_code'], 10),
       'COUNTRY'     => $params['country'],
       // ref not returned to Civi but visible in paypal
       'COMMENT1'    => 'civicrm contact ID ' . $params['contactID'],
       // ref not returned to Civi but visible in
-      'COMMENT2'    => 'contribution id ' . $params['contributionID'], paypal
+      'COMMENT2'    => 'contribution id ' . $params['contributionID'],
       // 11 max
       'CUSTID'      => $params['contributionIDinvoiceID'],
-      'DESCRIPTION' => $this->URLencodetoMaximumLength($params['description'], 255),
+      'DESCRIPTION' => $this->urlEncodeToMaximumLength($params['description'], 255),
       'EMAIL'       => $params['email'],
       // 9 max
       'INVOICE'     => $params['contributionID'],
-      'NAME'        => $this->URLencodetoMaximumLength($params['display_name'], 60),
+      'NAME'        => $this->urlEncodeToMaximumLength($params['display_name'], 60),
       'STATE'       => $params['state_province'],
       // USER fields are returned to Civi silent POST. Add them all in here for debug help.
       'USER1'       => $params['contactID'],
-      'USER2'       => $params['invoiceID'], 
-      'USER3'       => CRM_Utils_Array::value('participantID',$params),      
-      'USER4'       => CRM_Utils_Array::value('eventID',$params), 
-      'USER5'       => CRM_Utils_Array::value( 'membershipID', $params ),    
-      'USER6'       => CRM_Utils_Array::value( 'pledgeID', $params ), 
+      'USER2'       => $params['invoiceID'],
+      'USER3'       => CRM_Utils_Array::value('participantID', $params),
+      'USER4'       => CRM_Utils_Array::value('eventID', $params),
+      'USER5'       => CRM_Utils_Array::value( 'membershipID', $params ),
+      'USER6'       => CRM_Utils_Array::value( 'pledgeID', $params ),
       'USER7'       => $component . ", " .  $params['qfKey'],
-      'USER8'       => CRM_Utils_Array::value('contributionPageID',$params), 
-      'USER9'       => CRM_Utils_Array::value('related_contact',$params),
-      'USER10'      => CRM_Utils_Array::value( 'onbehalf_dupe_alert', $params ),                
+      'USER8'       => CRM_Utils_Array::value('contributionPageID', $params),
+      'USER9'       => CRM_Utils_Array::value('related_contact', $params),
+      'USER10'      => CRM_Utils_Array::value( 'onbehalf_dupe_alert', $params ),
     );
     return $processorParams;
+  }
+
+  /**
+   * Encodes string for a URL & ensures that it does not exceed the maximum
+   * length of the relevant field.
+   * The cut needs to be made after spaces etc are transformed (as the string
+   * becomes longer after html encoding but must not include a partial
+   * transformed character.
+   * E.g. space is encoded to %20 - these 3 characters must be included or
+   * excluded but not partially included.
+   *
+   * @params string $value
+   *   value to be encoded
+   * @params string $fieldLength
+   *   maximum length of encoded field
+   * @return string
+   *   value html encoded
+   */
+  protected function clipEncodedLength($str, $maxlength = 255) {
+    $cliplength = $maxlength;
+    while (TRUE) {
+      $clipped = substr($str, 0, $cliplength);
+      $enc = rawurlencode($clipped);
+      $length = strlen($enc);
+      if ($length <= $maxlength) {
+        // All fine.
+        return $clipped;
+      }
+      --$cliplength;
+    }
+  }
+
+  protected function calculateShaSign($processorParams) {
+    // TODO: This should rather happen AFTER the urlEncodeToMaximumLength..
+    ksort($processorParams);
+    $pieces = array();
+    foreach ($processorParams as $key => $value) {
+      if (isset($value) && '' !== $value) {
+        $pieces[] = $key . '=' . $value;
+      }
+    }
+    $glue = $this->_paymentProcessor['password'];
+    $str = implode($glue, $pieces);
+    return sha1($str);
   }
 }
