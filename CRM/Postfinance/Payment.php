@@ -4,6 +4,10 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
 
   static private $_singleton = array();
 
+  protected $legend;
+  protected $shaIn;
+  protected $shaOut;
+
   /**
    * "Singleton": Request an instance of this payment method based on the $info
    * parameters. If an instance with the same $info['name'] already exists, it
@@ -36,9 +40,22 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    *   name for an array.
    */
   function __construct($mode, $info) {
+
+    // Protected attributes of the parent class.
     $this->_mode = $mode;
     $this->_paymentProcessor = $info;
     $this->_processorName = ts('Post Finance');
+
+    // Protected attributes that we introduce.
+    $this->legend = new CRM_Postfinance_Legend();
+    $secret = $this->_paymentProcessor['password'];
+    $keys = $this->legend->shaInParams();
+    dpm($keys, '$keys');
+    dpm($secret, '$secret');
+    $this->shaIn = new CRM_Postfinance_ShaSignatureMaker($secret, $keys, 'sha1');
+    $secret = $this->_paymentProcessor['password'];
+    $keys = $this->legend->shaOutParams();
+    $this->shaOut = new CRM_Postfinance_ShaSignatureMaker($secret, $keys, 'sha1');
   }
 
   /**
@@ -164,6 +181,7 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     foreach ($urlQueryParams as $key => $value){
       if (!empty($value)) {
         // We know that the key is safe and doesn't need to be urlencoded.
+        // Only the value needs to be encoded.
         if (!is_numeric($value)) {
           $value = rawurlencode($value);
         }
@@ -220,15 +238,15 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
       'ORDERID' => $params['contributionID'],
       'AMOUNT' => $params['amount'],
       'CURRENCY' => $params['currencyID'],
-      'LANGUAGE' => $config->icMessages,
+      'LANGUAGE' => $config->lcMessages,
 
       // Optional customer details, highly recommended for fraud prevention.
       // Customer name
-      'CN' => $contact['display_name'],
-      'EMAIL' => $contact['email'],
-      'OWNERZIP' => $contact['postal_code'],
-      'OWNERADDRESS' => $contact['street_address'],
-      'OWNERCTY' => $contact['city'],
+      'CN' => @$contact['display_name'],
+      'EMAIL' => @$contact['email'],
+      'OWNERZIP' => @$contact['postal_code'],
+      'OWNERADDRESS' => @$contact['street_address'],
+      'OWNERCTY' => @$contact['city'],
       // Leave tel no empty for privacy.
       // 'OWNERTELNO' => '',
 
@@ -262,10 +280,10 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
       'PARAMVAR' => '',
 
       // Post payment redirection
-      'ACCEPTURL' => '',
-      'DECLINEURL' => '',
-      'EXCEPTIONURL' => '',
-      'CANCELURL' => '',
+      'ACCEPTURL' => 'http://civilab.localhost/postfinance/accept',
+      'DECLINEURL' => 'http://civilab.localhost/postfinance/decline',
+      'EXCEPTIONURL' => 'http://civilab.localhost/postfinance/exception',
+      'CANCELURL' => 'http://civilab.localhost/postfinance/cancel',
 
       // Optional operation field.
       'OPERATION' => '',
@@ -278,16 +296,26 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
       'ALIASUSAGE' => '',
       'ALIASOPERATION' => '',
     );
+    dpm($processorParams, '$processorParams before normalization');
 
     // Normalize processor params
     foreach ($processorParams as $k => &$v) {
-      if (!is_numeric($v)) {
-        $v = $this->clipEncodedLength($v);
+      if (FALSE === $v || !isset($v)) {
+        $v = '';
+      }
+      elseif (is_numeric($v)) {
+        // Let it be
+      }
+      elseif (is_string($v)) {
+        $v = CRM_Postfinance_Util::clipEncodedLength($v);
+      }
+      else {
+        throw new Exception("Invalid value for \$processorParams['$k'].");
       }
     }
 
     // hash/sign
-    $processorParams['SHASIGN'] = $this->calculateShaSign($processorParams);
+    $processorParams['SHASIGN'] = $this->shaIn->makeSignature($processorParams);
 
     dpm($processorParams, '$processorParams');
     return $processorParams;
@@ -329,49 +357,5 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
       'USER10'      => CRM_Utils_Array::value( 'onbehalf_dupe_alert', $params ),
     );
     return $processorParams;
-  }
-
-  /**
-   * Encodes string for a URL & ensures that it does not exceed the maximum
-   * length of the relevant field.
-   * The cut needs to be made after spaces etc are transformed (as the string
-   * becomes longer after html encoding but must not include a partial
-   * transformed character.
-   * E.g. space is encoded to %20 - these 3 characters must be included or
-   * excluded but not partially included.
-   *
-   * @params string $value
-   *   value to be encoded
-   * @params string $fieldLength
-   *   maximum length of encoded field
-   * @return string
-   *   value html encoded
-   */
-  protected function clipEncodedLength($str, $maxlength = 255) {
-    $cliplength = $maxlength;
-    while (TRUE) {
-      $clipped = substr($str, 0, $cliplength);
-      $enc = rawurlencode($clipped);
-      $length = strlen($enc);
-      if ($length <= $maxlength) {
-        // All fine.
-        return $clipped;
-      }
-      --$cliplength;
-    }
-  }
-
-  protected function calculateShaSign($processorParams) {
-    // TODO: This should rather happen AFTER the urlEncodeToMaximumLength..
-    ksort($processorParams);
-    $pieces = array();
-    foreach ($processorParams as $key => $value) {
-      if (isset($value) && '' !== $value) {
-        $pieces[] = $key . '=' . $value;
-      }
-    }
-    $glue = $this->_paymentProcessor['password'];
-    $str = implode($glue, $pieces);
-    return sha1($str);
   }
 }
