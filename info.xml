@@ -31,8 +31,8 @@
     <namespace>CRM/Postfinance</namespace>
   </civix>
   <typeInfo>
-   <userNameLabel>PSPID (Postfinance Merchant ID)</userNameLabel>
-   <passwordLabel>Password</passwordLabel>
+   <userNameLabel>PSPID (Merchant ID)</userNameLabel>
+   <passwordLabel>SHA-IN pass phrase</passwordLabel>
    <signatureLabel></signatureLabel>
    <subjectLabel></subjectLabel>
    <urlSiteDefault>https://e-payment.postfinance.ch/ncol/prod/orderstandard_utf8.asp</urlSiteDefault>
