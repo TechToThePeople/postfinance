@@ -12,7 +12,7 @@ require_once 'postfinance.civix.php';
  * Implementation of hook_civicrm_config
  */
 function postfinance_civicrm_config(&$config) {
-  _postfinance_civix_civicrm_config($config);
+  // _postfinance_civix_civicrm_config($config);
 }
 
 /**
@@ -21,35 +21,35 @@ function postfinance_civicrm_config(&$config) {
  * @param $files array(string)
  */
 function postfinance_civicrm_xmlMenu(&$files) {
-  _postfinance_civix_civicrm_xmlMenu($files);
+  // _postfinance_civix_civicrm_xmlMenu($files);
 }
 
 /**
  * Implementation of hook_civicrm_install
  */
 function postfinance_civicrm_install() {
-  return _postfinance_civix_civicrm_install();
+  // return _postfinance_civix_civicrm_install();
 }
 
 /**
  * Implementation of hook_civicrm_uninstall
  */
 function postfinance_civicrm_uninstall() {
-  return _postfinance_civix_civicrm_uninstall();
+  // return _postfinance_civix_civicrm_uninstall();
 }
 
 /**
  * Implementation of hook_civicrm_enable
  */
 function postfinance_civicrm_enable() {
-  return _postfinance_civix_civicrm_enable();
+  // return _postfinance_civix_civicrm_enable();
 }
 
 /**
  * Implementation of hook_civicrm_disable
  */
 function postfinance_civicrm_disable() {
-  return _postfinance_civix_civicrm_disable();
+  // return _postfinance_civix_civicrm_disable();
 }
 
 /**
@@ -62,7 +62,7 @@ function postfinance_civicrm_disable() {
  *                for 'enqueue', returns void
  */
 function postfinance_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _postfinance_civix_civicrm_upgrade($op, $queue);
+  // return _postfinance_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -72,5 +72,5 @@ function postfinance_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * is installed, disabled, uninstalled.
  */
 function postfinance_civicrm_managed(&$entities) {
-  return _postfinance_civix_civicrm_managed($entities);
+  // return _postfinance_civix_civicrm_managed($entities);
 }
