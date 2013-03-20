@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Postfinance_IPN extends CRM_Core_Payment_BaseIPN {
+class CRM_Postfinance_IPN {
 
   protected $info;
   protected $shaOut;
