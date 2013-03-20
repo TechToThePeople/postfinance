@@ -32,4 +32,27 @@ class CRM_Postfinance_Util {
       --$cliplength;
     }
   }
+
+  /**
+   * Build string of name value pairs for url.
+   *
+   * @params array $paymentProcessorParams
+   *
+   * @return string
+   *   Payment processor query string
+   */
+  static function urlQueryString(array $urlQueryParams) {
+    $pieces = array();
+    foreach ($urlQueryParams as $key => $value){
+      if (!empty($value)) {
+        // We know that the key is safe and doesn't need to be urlencoded.
+        // Only the value needs to be encoded.
+        if (!is_numeric($value)) {
+          $value = rawurlencode($value);
+        }
+        $pieces[] = $key . '=' . $value;
+      }
+    }
+    return implode('&', $pieces);
+  }
 }

@@ -16,7 +16,7 @@ class CRM_Postfinance_ShaSignatureMaker {
    */
   function __construct($secret, array $keys, $algo = 'sha1') {
     $this->secret = $secret;
-    $this->keys = $keys;
+    $this->keys = array_combine($keys, $keys);
     $this->algo = $algo;
   }
 
@@ -30,14 +30,23 @@ class CRM_Postfinance_ShaSignatureMaker {
    *   Hash for the given params.
    */
   function makeSignature(array $params) {
-    dpm($params, 'makeSignature($params)');
     $str = '';
-    foreach ($this->keys as $key) {
-      if (isset($params[$key]) && '' !== $params[$key]) {
-        $str .= $key . '=' . $params[$key] . $this->secret;
+    $params = $this->keysToUpper($params);
+    ksort($params);
+    foreach ($params as $k => $v) {
+      if (isset($this->keys[$k]) && isset($v) && '' !== $v) {
+        $str .= $k . '=' . $v . $this->secret;
       }
     }
-    dpm($str, '$str before hash()');
+    dpm($str);
     return hash($this->algo, $str);
+  }
+
+  protected function keysToUpper(array $arr) {
+    $result = array();
+    foreach ($arr as $k => $v) {
+      $result[strtoupper($k)] = $v;
+    }
+    return $result;
   }
 }
