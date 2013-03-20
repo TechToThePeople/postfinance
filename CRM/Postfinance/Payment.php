@@ -68,8 +68,6 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     // TODO: shaOut should have a different secret than shaIn.
     $secret = $this->_paymentProcessor['password'];
     $keys = $legend->shaOutParams();
-    dpm($this->_paymentProcessor);
-    dpm($secret, '$secret');
     $shaOut = new CRM_Postfinance_ShaSignatureMaker($secret, $keys, 'sha1');
     $this->ipn = new CRM_Postfinance_IPN($info, $shaOut);
   }
@@ -156,25 +154,10 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    */
   function handlePaymentNotification() {
 
-    $this->logger->log($_GET, 'IPN $_GET');
-    $this->logger->log($_POST, 'IPN $_POST');
+    // $this->logger->log($_GET, 'IPN $_GET');
+    // $this->logger->log($_POST, 'IPN $_POST');
 
-    $component = A::value('mo', $_GET, 'contribute');
-
-    // Attempt to determine component type ...
-    switch ($component) {
-
-      case 'contribute':
-      case 'event':
-        ob_start();
-        $this->ipn->main($component, $_POST);
-        $output = ob_get_clean();
-        break;
-
-      default:
-        CRM_Core_Error::debug_log_message("Could not get component name from request url");
-        $output = "Could not get component name from request url\r\n";
-    }
+    $output = $this->ipn->handleIPN($component, $_POST);
 
     // Print and exit(),
     // to prevent CiviCRM from doing the usual request output.

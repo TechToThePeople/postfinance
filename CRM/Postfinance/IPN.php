@@ -20,9 +20,10 @@ class CRM_Postfinance_IPN {
    * @param string $component
    *   Typically either 'contribute' or 'event'.
    */
-  function main($params) {
+  function handleIPN($params) {
 
-    $bogus_params = array(
+    // Just to see how the params can look like.
+    $example_params = array(
       'orderID' => 65,
       'currency' => 'CHF',
       'amount' => 555,
@@ -42,8 +43,7 @@ class CRM_Postfinance_IPN {
 
     $sha = $this->shaOut->makeSignature($params);
     if (strtoupper($sha) !== $params['SHASIGN']) {
-      print 'SHASIGN FAIL: ' . $sha;
-      return;
+      return 'SHASIGN FAIL: ' . $sha;
     }
 
     if (0
@@ -59,6 +59,9 @@ class CRM_Postfinance_IPN {
       // Reject
       $this->setContributionStatusId($params['orderID'], 2);
     }
+
+    // TODO: Return something smarter.
+    return 'SUCCESS';
   }
 
   /**
