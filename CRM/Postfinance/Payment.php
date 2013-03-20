@@ -48,7 +48,7 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     // Protected attributes of the parent class.
     $this->_mode = $mode;
     $this->_paymentProcessor = $info;
-    $this->_processorName = ts('Post Finance');
+    $this->_processorName = 'Post Finance';
 
     // Protected attributes that we introduce.
 
