@@ -22,7 +22,7 @@ class CRM_Postfinance_IPN extends CRM_Core_Payment_BaseIPN {
    */
   function main($params) {
 
-    $params = array(
+    $bogus_params = array(
       'orderID' => 65,
       'currency' => 'CHF',
       'amount' => 555,
@@ -52,9 +52,11 @@ class CRM_Postfinance_IPN extends CRM_Core_Payment_BaseIPN {
       // "Payment requested"
       || $params['STATUS'] == 9
     ) {
+      // Accept
       $this->setContributionStatusId($params['orderID'], 1);
     }
     else {
+      // Reject
       $this->setContributionStatusId($params['orderID'], 2);
     }
   }

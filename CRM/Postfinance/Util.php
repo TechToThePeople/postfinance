@@ -34,27 +34,6 @@ class CRM_Postfinance_Util {
   }
 
   /**
-   * Build the url of the page to display after the payment (thank you page)
-   *
-   * @params array $paymentProcessorParams
-   *
-   * @return string
-   *   Payment processor query string
-   */
-  static function returnUrl($component,$params) {
-    if ( $component == "event" ) {
-      return CRM_Utils_System::url( 'civicrm/event/register',
-          "_qf_ThankYou_display=1&qfKey={$params['qfKey']}", 
-          true, null, false );
-    } elseif ( $component == "contribute" ) {
-      return CRM_Utils_System::url( 'civicrm/contribute/transact',
-          "_qf_ThankYou_display=1&qfKey={$params['qfKey']}",
-          true, null, false );
-    }
-    CRM_Core_Error::debug_log_message("Could not get component name from request url");
-  }
-
-  /**
    * Build string of name value pairs for url.
    *
    * @params array $paymentProcessorParams
@@ -75,5 +54,10 @@ class CRM_Postfinance_Util {
       }
     }
     return implode('&', $pieces);
+  }
+
+  static function url($path, array $urlQueryParams) {
+    $urlQueryString = self::urlQueryString($urlQueryParams);
+    return CRM_Utils_System::url($path, $urlQueryString, TRUE, NULL, FALSE);
   }
 }

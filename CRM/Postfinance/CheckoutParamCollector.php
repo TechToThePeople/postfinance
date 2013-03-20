@@ -34,12 +34,14 @@ class CRM_Postfinance_CheckoutParamCollector {
   function collectCheckoutParams($params, $component) {
 
     // Build the params for the url.
-    $urlParams = $this->buildRawParams($params, $component);
+    $rawParams = $this->buildRawParams($params, $component);
 
-    $urlParams = $this->normalizeValues($urlParams);
+    $urlParams = $this->normalizeValues($rawParams);
 
     // hash/sign
     $urlParams['SHASIGN'] = $this->shaIn->makeSignature($urlParams);
+
+    dpm($urlParams, '$urlParams');
 
     return $urlParams;
   }
@@ -88,12 +90,10 @@ class CRM_Postfinance_CheckoutParamCollector {
     // Contact has some values that we are interested in.
     $contact = $this->paramsLoadContact($params);
 
-    $cancelURL = $this->getCancelURL($params, $component);
-
     // Load the config for current language.
     $config = CRM_Core_Config::singleton();
 
-    return array(
+    $rawParams = array(
 
       // postfinance merchant account name.
       'PSPID' => $this->info['user_name'],
@@ -142,11 +142,11 @@ class CRM_Postfinance_CheckoutParamCollector {
       // Post payment params: Feedback
       'PARAMVAR' => '',
 
-      // Post payment redirection
-      'ACCEPTURL' => 'http://civilab.localhost/postfinance/accept',
-      'DECLINEURL' => 'http://civilab.localhost/postfinance/decline',
-      'EXCEPTIONURL' => 'http://civilab.localhost/postfinance/exception',
-      'CANCELURL' => 'http://civilab.localhost/postfinance/cancel',
+      // Post payment redirection. These are set below.
+      'ACCEPTURL' => '',
+      'DECLINEURL' => '',
+      'EXCEPTIONURL' => '',
+      'CANCELURL' => '',
 
       // Optional operation field.
       'OPERATION' => '',
@@ -159,6 +159,15 @@ class CRM_Postfinance_CheckoutParamCollector {
       'ALIASUSAGE' => '',
       'ALIASOPERATION' => '',
     );
+
+    foreach (array(
+      'ACCEPTURL', 'DECLINEURL',
+      'EXCEPTIONURL', 'CANCELURL'
+    ) as $k) {
+      $rawParams[$k] = $this->postPaymentRedirectURL($params, $component, $k);
+    }
+
+    return $rawParams;
   }
 
   /**
@@ -190,33 +199,52 @@ class CRM_Postfinance_CheckoutParamCollector {
   }
 
   /**
-   * Get URL which the browser should be returned to if they cancel or are unsuccessful
+   * Build the url of the page to display after the payment (thank you page)
    *
    * @param array $params
    *   Name value pair of contribution data
    * @param string $component
-   *   Can be either 'contribute' or 'event' or the name of another civicrm component.
+   *   Can be either 'contribute' or 'event'.
+   * @param string $type
+   *   Can be 'ACCEPTURL', 'DECLINEURL', 'EXCEPTIONURL', 'CANCELURL'.
    *
    * @return string
    *   Fully qualified return URL
-   *
-   * @todo Ideally this would be in the parent payment class
    */
-  function getCancelURL($params, $component){
-    $component = strtolower( $component );
-    if ($component != 'contribute' && $component != 'event') {
-      CRM_Core_Error::fatal(ts('Component is invalid'));
+  protected function postPaymentRedirectURL($params, $component, $type = 'ACCEPTURL') {
+
+    switch ($component) {
+      case 'event':
+        $path = 'civicrm/event/register';
+        break;
+      case 'contribute':
+        $path = 'civicrm/contribute/transact';
+        break;
+      default:
+        // Missing component. This is dealt with elsewhere.
+        return '';
     }
 
-    if ($component == 'event') {
-      $path = 'civicrm/event/register';
-    }
-    elseif ($component == 'contribute') {
-      $path = 'civicrm/contribute/transact';
+    $urlQueryParams = array(
+      'qfKey' => $params['qfKey'],
+    );
+
+    switch ($type) {
+      case 'ACCEPTURL':
+        $urlQueryParams['_qf_ThankYou_display'] = 1;
+        break;
+      case 'CANCELURL':
+        // TODO: Does this make sense? It is copied from elsewhere.
+        $urlQueryParams['_qf_Confirm_display'] = 'true';
+        break;
+      case 'DECLINEURL':
+      case 'EXCEPTIONURL':
+      default:
+        // Empty url, for now.
+        return '';
     }
 
-    $query = "_qf_Confirm_display=true&qfKey={$params['qfKey']}";
-    return CRM_Utils_System::url($path, $query, FALSE, NULL, FALSE);
+    return CRM_Postfinance_Util::url($path, $urlQueryParams);
   }
 
   /**
