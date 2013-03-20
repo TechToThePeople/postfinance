@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <extension key="eu.tttp.postfinance" type="payment">
-
-
   <file>postfinance</file>
   <name>PostFinance Swiss Payment</name>
   <description>Swiss payment system PostFinance. 
@@ -27,9 +25,6 @@
     <ver>4.2</ver>
     <ver>4.3</ver>
   </compatibility>
-  <civix>
-    <namespace>CRM/Postfinance</namespace>
-  </civix>
   <typeInfo>
    <userNameLabel>PSPID (Merchant ID)</userNameLabel>
    <passwordLabel>SHA-IN pass phrase</passwordLabel>
