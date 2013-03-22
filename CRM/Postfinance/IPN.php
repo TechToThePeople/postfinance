@@ -12,8 +12,6 @@ class CRM_Postfinance_IPN {
 
     require_once 'api/class.api.php';
     $this->crm = new civicrm_api3();
-
-    parent::__construct();
   }
 
   /**
