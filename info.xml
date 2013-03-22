@@ -28,7 +28,7 @@
   <typeInfo>
    <userNameLabel>PSPID (Merchant ID)</userNameLabel>
    <passwordLabel>SHA-IN pass phrase</passwordLabel>
-   <signatureLabel></signatureLabel>
+   <signatureLabel>SHA-OUT pass phrase</signatureLabel>
    <subjectLabel></subjectLabel>
    <urlSiteDefault>https://e-payment.postfinance.ch/ncol/prod/orderstandard_utf8.asp</urlSiteDefault>
    <urlApiDefault></urlApiDefault>
