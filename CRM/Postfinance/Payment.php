@@ -20,10 +20,9 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of the operation: live or test.
    * @param array $info
-   *   Not sure what that is.
-   *   It is called $paymentProcessor in other examples, but that's a bit stupid
-   *   name for an array. This thing is not the processor itself, it is just an
-   *   array of params.
+   *   Array of configuraton params for the payment processor instance.
+   *   It is called $paymentProcessor in other examples. We name it $info, to
+   *   avoid it being mistaken for an object.
    */
   static function singleton($mode, $info) {
     $name = $info['name'];
@@ -39,9 +38,9 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of the operation: live or test.
    * @param array $info
-   *   Various information about the payment processor instance.
-   *   It is called $paymentProcessor in other examples, but that's a bit stupid
-   *   name for an array.
+   *   Array of configuraton params for the payment processor instance.
+   *   It is called $paymentProcessor in other examples. We name it $info, to
+   *   avoid it being mistaken for an object.
    */
   function __construct($mode, $info) {
 
