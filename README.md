@@ -37,8 +37,14 @@ Open "Configuration" > "Technical information" in the menu.
   URL of the merchant page. E.g.
   Accept: http://www.example.com/civicrm/payment/ipn/ok?processor_name=postfinance&mode=test
   Cancel: http://www.example.com/civicrm/payment/ipn/notok?processor_name=postfinance&mode=test
-  (The CiviCRM payment processor will only use the POST data. It does not care
-  about "ok" or "notok" after the "ipn".)
+
+  Notes
+  The CiviCRM payment processor will ignore the "ok" or "notok" after the "ipn".
+  However, it absolutely needs the processor_name and mode GET params.
+  The processor_name needs to be identical with the extension name. This is why
+  we chose a simple lowercase name without spaces.
+  The mode should be set to 'live' when the testing phase is over.
+  All other data is transmitted with POST.
 
   Method: POST
 

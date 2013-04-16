@@ -39,7 +39,7 @@ class CRM_Postfinance_ShaSignatureMaker {
         $str .= $k . '=' . $v . $this->secret;
       }
     }
-    dpm($str);
+    // dpm($str);
     return hash($this->algo, $str);
   }
 

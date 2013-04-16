@@ -41,7 +41,7 @@ class CRM_Postfinance_CheckoutParamCollector {
     // hash/sign
     $urlParams['SHASIGN'] = $this->shaIn->makeSignature($urlParams);
 
-    dpm($urlParams, '$urlParams');
+    // dpm($urlParams, '$urlParams');
 
     return $urlParams;
   }

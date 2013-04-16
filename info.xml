@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <extension key="eu.tttp.postfinance" type="payment">
   <file>postfinance</file>
-  <name>PostFinance Swiss Payment</name>
+  <name>postfinance</name>
   <description>Swiss payment system PostFinance. 
      Partly funded by TEDx Lausanne. If you are using it, please consider contributing financially to its development too. By all means, feel free to contact us if you need some help for your civicrm project, we are based in Geneva. xavier.dutoit@tttp.eu
   </description>
