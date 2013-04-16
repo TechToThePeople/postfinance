@@ -12,9 +12,10 @@ class CRM_Postfinance_ShaSignatureMaker {
    * @param array $keys
    *   Keys of the param that should be used for hash calculation.
    * @param string $algo
-   *   The algorithm to use - e.g. md5, sha1, etc.
+   *   The algorithm to use - e.g. "md5", "sha1", "sha512" etc.
+   *   Typically this is called with "sha512".
    */
-  function __construct($secret, array $keys, $algo = 'sha1') {
+  function __construct($secret, array $keys, $algo) {
     $this->secret = $secret;
     $this->keys = array_combine($keys, $keys);
     $this->algo = $algo;
