@@ -153,10 +153,7 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    */
   function handlePaymentNotification() {
 
-    // $this->logger->log($_GET, 'IPN $_GET');
-    // $this->logger->log($_POST, 'IPN $_POST');
-
-    $output = $this->ipn->handleIPN($component, $_POST);
+    $output = $this->ipn->handleIPN($_POST);
 
     // Print and exit(),
     // to prevent CiviCRM from doing the usual request output.

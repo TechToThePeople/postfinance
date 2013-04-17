@@ -15,8 +15,8 @@ class CRM_Postfinance_IPN {
   }
 
   /**
-   * @param string $component
-   *   Typically either 'contribute' or 'event'.
+   * @param array $params
+   *   The POST params sent with the request
    */
   function handleIPN($params) {
 
@@ -51,25 +51,21 @@ class CRM_Postfinance_IPN {
       || $params['STATUS'] == 9
     ) {
       // Accept
-      $this->setContributionStatusId($params['orderID'], 1);
+      $status_id = 1;
     }
     else {
       // Reject
-      $this->setContributionStatusId($params['orderID'], 2);
+      $status_id = 2;
     }
+
+    $api_result = civicrm_api('contribution', 'create', array(
+      'version' => 3,
+      'id' => $params['orderID'],
+      'contribution_status_id' => $status_id,
+      'cancel_reason' => print_r($params, TRUE),
+    ));
 
     // TODO: Return something smarter.
     return 'SUCCESS';
-  }
-
-  /**
-   * Mark a contribution as saved or not saved.
-   */
-  protected function setContributionStatusId($contribution_id, $status_id) {
-    $api_result = civicrm_api('contribution', 'create', array(
-      'version' => 3,
-      'contribution_id' => $contribution_id,
-      'contribution_status_id' => $status_id,
-    ));
   }
 }
