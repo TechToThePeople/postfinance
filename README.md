@@ -9,11 +9,13 @@ https://e-payment.postfinance.ch/ncol/test/admin_postfinance.asp
 
 Open "Configuration" > "Technical information" in the menu.
 
+
 ### Conf. > Techn. Inf. > Global security parameters
 
 - "Compose the string ...": "Each parameter followed by a passphrase."
   Hash algorithm: SHA-512
   Character encoding: UTF-8
+
 
 ### Conf. > Techn. Inf. > Data and origin verification
 
@@ -24,6 +26,7 @@ Open "Configuration" > "Technical information" in the menu.
 - "SHA-IN Pass phrase":
   Randomize a string, and remember it for later. Can be e.g. 30 characters.
   random.org might help you (slice and recombine, if you don't trust random.org).
+
 
 ### Conf. > Techn. Inf. > Transaction feedback
 
@@ -57,10 +60,12 @@ Open "Configuration" > "Technical information" in the menu.
 Add the currencies of your choice.
 (Recommended: CHF, EUR, USD)
 
+
 ### Conf. > Payment methods
 
 Add the payment methods of your choice.
 (e.g. VISA)
+
 
 
 ## On CiviCRM:
@@ -68,6 +73,7 @@ Add the payment methods of your choice.
 ### Install the extension
 
 Administer > System settings > Manage extensions
+
 
 ### Create payment processor(s)
 
@@ -79,6 +85,7 @@ Administer > System settings > Payment processors
   PSPID (Merchant ID): The name you use to login on the postfinance backend
   SHA-IN pass phrase: Same as above
   SHA-OUT pass phrase: Same as above
+
 
 ### Adjust localization / currency settings
 
