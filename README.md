@@ -135,3 +135,9 @@ Usually this means a mismatch of the SHA
 
 "unknown order/1/r/":
 Usually this means you have the wrong referer url.
+
+## Online help
+
+"Parameter cookbook": https://e-payment.postfinance.ch/ncol/param_cookbook.asp
+
+
