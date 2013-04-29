@@ -23,7 +23,6 @@ Open "Configuration" > "Technical information" in the menu.
 
 - Define the url of the merchant page, without subfolders, trailing slashes and spaces. ex:
   http://example.org/civicrm/contribute/transact;http://www.example.org/civicrm/contribute/transact
-  (TODO: No idea what the second url is doing here.)
 
 - "SHA-IN Pass phrase":
   Randomize a string, and remember it for later. eg. sha1(uniqid(mt_rand(), true))
