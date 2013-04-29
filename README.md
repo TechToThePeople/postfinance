@@ -2,6 +2,8 @@
 
 # How to use
 
+This document is assuming that your civicrm site is installed on example.org, and that you use drupal clean urls. Please adjust accordingly for another domain/CMS
+
 ## On PostFinance backend:
 
 Create a test account, and login to the admin backend.
@@ -20,12 +22,11 @@ Open "Configuration" > "Technical information" in the menu.
 ### Conf. > Techn. Inf. > Data and origin verification
 
 - Define the url of the merchant page, without subfolders, trailing slashes and spaces. ex:
-  http://civilab.localhost/civicrm/contribute/transact;http://42.crm/civicrm/contribute/transact
+  http://example.org/civicrm/contribute/transact;http://www.example.org/civicrm/contribute/transact
   (TODO: No idea what the second url is doing here.)
 
 - "SHA-IN Pass phrase":
-  Randomize a string, and remember it for later. Can be e.g. 30 characters.
-  random.org might help you (slice and recombine, if you don't trust random.org).
+  Randomize a string, and remember it for later. eg. sha1(uniqid(mt_rand(), true))
 
 
 ### Conf. > Techn. Inf. > Transaction feedback
@@ -37,22 +38,22 @@ Open "Configuration" > "Technical information" in the menu.
 
   Request type: Always online
 
-  URL of the merchant page. E.g.
-  Accept: http://www.example.com/civicrm/payment/ipn/ok?processor_name=postfinance&mode=test
-  Cancel: http://www.example.com/civicrm/payment/ipn/notok?processor_name=postfinance&mode=test
+  URL of the merchant page. 
+-  Accept: http://www.example.org/civicrm/payment/ipn/ok?processor_name=postfinance&mode=test
+-  Cancel: http://www.example.org/civicrm/payment/ipn/notok?processor_name=postfinance&mode=test
 
   Notes
   The CiviCRM payment processor will ignore the "ok" or "notok" after the "ipn".
   However, it absolutely needs the processor_name and mode GET params.
   The processor_name needs to be identical with the extension name. This is why
   we chose a simple lowercase name without spaces.
-  The mode should be set to 'live' when the testing phase is over.
-  All other data is transmitted with POST.
+  The mode should be set to 'live' on the prod postfinance config.
+  All other data is transmitted with http POST. SSL is not necessary on the IPN.
 
   Method: POST
 
 - "SHA-OUT Pass phrase":
-  Again, randomize a string, and remember it for later.
+  Again, randomize a string (different than SHA-IN), and remember it for later.
 
 
 ### Conf. > Account > Currencies
