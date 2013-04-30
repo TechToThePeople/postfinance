@@ -6,31 +6,13 @@ use CRM_Postfinance_Util as Util;
 
 class CRM_Postfinance_Payment extends CRM_Core_Payment {
 
-  static private $_singleton = array();
+  protected $_paymentProcessor;
+
+  protected $_paymentForm = NULL;
 
   protected $checkout;
   protected $ipn;
   protected $logger;
-
-  /**
-   * "Singleton": Request an instance of this payment method based on the $info
-   * parameters. If an instance with the same $info['name'] already exists, it
-   * will return that, otherwise it will create a new one.
-   *
-   * @param string $mode
-   *   The mode of the operation: live or test.
-   * @param array $info
-   *   Array of configuraton params for the payment processor instance.
-   *   It is called $paymentProcessor in other examples. We name it $info, to
-   *   avoid it being mistaken for an object.
-   */
-  static function singleton($mode, $info) {
-    $name = $info['name'];
-    if (!isset(self::$_singleton[$name])) {
-      self::$_singleton[$name] = new self($mode, $info);
-    }
-    return self::$_singleton[$name];
-  }
 
   /**
    * Constructor
@@ -50,6 +32,12 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     $this->_processorName = 'Post Finance';
 
     // Protected attributes that we introduce.
+    $this->initServices();
+  }
+
+  protected function initServices() {
+
+    $info = $this->_paymentProcessor;
 
     // Logger
     $this->logger = new CRM_Postfinance_Logger();
@@ -58,14 +46,14 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     $legend = new CRM_Postfinance_Legend();
 
     // CheckoutParamCollector with SHA-IN
-    $secret = $this->_paymentProcessor['password'];
+    $secret = $info['password'];
     $keys = $legend->shaInParams();
     $shaIn = new CRM_Postfinance_ShaSignatureMaker($secret, $keys, 'sha512');
     $this->checkout = new CRM_Postfinance_CheckoutParamCollector($info, $shaIn);
 
     // IPN with SHA-OUT
     // TODO: shaOut should have a different secret than shaIn.
-    $secret = $this->_paymentProcessor['password'];
+    $secret = $info['password'];
     $keys = $legend->shaOutParams();
     $shaOut = new CRM_Postfinance_ShaSignatureMaker($secret, $keys, 'sha512');
     $this->ipn = new CRM_Postfinance_IPN($info, $shaOut);
