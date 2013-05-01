@@ -52,8 +52,7 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
     $this->checkout = new CRM_Postfinance_CheckoutParamCollector($info, $shaIn);
 
     // IPN with SHA-OUT
-    // TODO: shaOut should have a different secret than shaIn.
-    $secret = $info['password'];
+    $secret = isset($info['signature']) ? $info['signature'] : $info['password'];
     $keys = $legend->shaOutParams();
     $shaOut = new CRM_Postfinance_ShaSignatureMaker($secret, $keys, 'sha512');
     $this->ipn = new CRM_Postfinance_IPN($info, $shaOut);
