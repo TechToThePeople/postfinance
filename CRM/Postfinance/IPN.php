@@ -54,11 +54,11 @@ class CRM_Postfinance_IPN {
     ) {
       // Accept
       $status_id = 1;
-      $status_name = 'REJECT';
+      $status_name = 'ACCEPT';
     }
     else {
       // Reject
-      $status_id = 2;
+      $status_id = 3;
       $status_name = 'REJECT';
     }
 
