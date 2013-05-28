@@ -4,7 +4,7 @@
   <!-- The extension cannot contain uppercase or special characters. -->
   <name>postfinance</name>
   <description>Swiss payment system PostFinance. 
-     Partly funded by TEDx Lausanne & the CERN. If you are using it, please consider contributing financially to its development too.
+     Partly funded by TEDx Lausanne and the CERN. If you are using it, please consider contributing financially to its development too.
   </description>
   <downloadUrl>https://github.com/TechToThePeople/eu.tttp.postfinance/archive/master.zip</downloadUrl>
   <urls>

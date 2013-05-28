@@ -19,7 +19,9 @@ class eu_tttp_postfinance extends CRM_Postfinance_Payment {
    *   Array of configuraton params for the payment processor instance.
    *   It is called $paymentProcessor in other examples. We name it $info, to
    *   avoid it being mistaken for an object.
-  static function singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
+   */
+
+  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $name = $info['name'];
     if (!isset(self::$_singleton[$name])) {
       self::$_singleton[$name] = new self($mode, $info);
@@ -27,8 +29,6 @@ class eu_tttp_postfinance extends CRM_Postfinance_Payment {
     }
     return self::$_singleton[$name];
   }
-   */
-
   /**
    * Magic __sleep() method, called before the object is serialized.
    *
