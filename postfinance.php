@@ -21,7 +21,7 @@ class eu_tttp_postfinance extends CRM_Postfinance_Payment {
    *   avoid it being mistaken for an object.
    */
 
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  static function &singleton($mode = 'test', &$info, &$paymentForm = NULL, $force = FALSE) {
     $name = $info['name'];
     if (!isset(self::$_singleton[$name])) {
       self::$_singleton[$name] = new self($mode, $info);
