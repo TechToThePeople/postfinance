@@ -123,6 +123,14 @@ class CRM_Postfinance_Payment extends CRM_Core_Payment {
    */
   function doTransferCheckout(&$params, $component) {
 
+    //we need to create the activity here, otherwise the IPN is not working </facepalm>
+    $a=civicrm_api("Activity","create",array("version"=>"3",
+      "source_record_id"=>$params["contributionID"],
+      "subject"=>ts("postfinance"),
+      "location"=>$component,
+      "activity_type_id"=> CRM_Core_OptionGroup::getValue('activity_type','Contribution','name')
+    ));
+
     $component = strtolower($component);
     $paymentProcessorParams = $this->checkout->collectCheckoutParams($params, $component);
 

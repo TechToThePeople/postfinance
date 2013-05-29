@@ -42,7 +42,8 @@ class CRM_Postfinance_IPN {
     $sha = $this->shaOut->makeSignature($params);
     if (strtoupper($sha) !== $params['SHASIGN']) {
       $print_r_params = var_export($params, TRUE);
-      watchdog('civicrm.postfinance', "IPN SHASIGN FAIL. orderID=$params[orderID]. status=$params[STATUS]. '$sha' !== '$params[SHASIGN]' params: $print_r_params.");
+      $print_r_processor_info = $this->info['name'] . ':' . $this->info['id'];
+      watchdog('civicrm.postfinance', "IPN SHASIGN FAIL. orderID=$params[orderID]. status=$params[STATUS]. processor=$print_r_processor_info. '$sha' !== '$params[SHASIGN]' params: $print_r_params.");
       return 'SHASIGN FAIL: ' . $sha;
     }
 
@@ -62,16 +63,18 @@ class CRM_Postfinance_IPN {
       $status_name = 'REJECT';
     }
 
-    $api_result = civicrm_api('contribution', 'create', $api_params = array(
+    $api_params = array(
       'version' => 3,
       'id' => $params['orderID'],
       'contribution_status_id' => $status_id,
       // 'cancel_reason' => print_r($params, TRUE),
-    ));
+    );
+
+    $api_result = civicrm_api('contribution', 'create', $api_params);
 
     if (!empty($api_result['is_error'])) {
       $print_r_api_result = var_export($api_result, TRUE);
-      watchdog('civicrm.postfinance', "IPN $status_name. orderID=$params[orderID]. status=$params[STATUS].  API result: $print_r_api_result.");
+      watchdog('civicrm.postfinance', "IPN $status_name, but API fail. orderID=$params[orderID]. status=$params[STATUS].  API result: $print_r_api_result.");
       $print_r_api_params = var_export($api_params, TRUE);
       watchdog('civicrm.postfinance', "API params: $print_r_api_params.");
     }
