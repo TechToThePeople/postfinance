@@ -99,7 +99,7 @@ class CRM_Postfinance_CheckoutParamCollector {
       'PSPID' => $this->info['user_name'],
       // order id must be unique.
       'ORDERID' => $params['contributionID'],
-      'AMOUNT' => round($params['amount'] * 100),
+      'AMOUNT' => round(CRM_Utils_Rule::cleanMoney($params['amount']) * 100),
       'CURRENCY' => $params['currencyID'],
       'LANGUAGE' => $config->lcMessages,
 
