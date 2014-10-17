@@ -234,8 +234,8 @@ class CRM_Postfinance_CheckoutParamCollector {
         $urlQueryParams['_qf_ThankYou_display'] = 1;
         break;
       case 'CANCELURL':
-        // TODO: Does this make sense? It is copied from elsewhere.
-        $urlQueryParams['_qf_Confirm_display'] = 'true';
+        $urlQueryParams['_qf_Main_display'] = 'true';
+        $urlQueryParams['cancel'] = 1;
         break;
       case 'DECLINEURL':
       case 'EXCEPTIONURL':
