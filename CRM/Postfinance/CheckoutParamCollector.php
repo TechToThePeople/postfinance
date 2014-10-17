@@ -122,7 +122,7 @@ class CRM_Postfinance_CheckoutParamCollector {
       // ...
 
       // Dynamic template page. Optional!!
-      // 'TP' => '',
+      // 'TP' => 'https://giving.web.cern.ch/sites/giving.web.cern.ch/files/postfinance/template.html',
 
       // Payment method and payment specifics. Optional!!
       // 'PM' => '',
