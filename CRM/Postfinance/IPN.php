@@ -62,7 +62,7 @@ class CRM_Postfinance_IPN {
       $status_id = 3;
       $status_name = 'REJECT';
     }
-
+/*
     $api_params = array(
       'version' => 3,
       'id' => $params['orderID'],
@@ -71,7 +71,15 @@ class CRM_Postfinance_IPN {
     );
 
     $api_result = civicrm_api('contribution', 'create', $api_params);
-
+*/
+    $api_params = array(
+      'version' => 3,
+      'id' => $params['orderID'],
+      'field'=>'contribution_status_id',
+      'value' => $status_id
+      // 'cancel_reason' => print_r($params, TRUE),
+    );
+    $api_result = civicrm_api('contribution', 'setvalue', $api_params);
     if (!empty($api_result['is_error'])) {
       $print_r_api_result = var_export($api_result, TRUE);
       watchdog('civicrm.postfinance', "IPN $status_name, but API fail. orderID=$params[orderID]. status=$params[STATUS].  API result: $print_r_api_result.");
