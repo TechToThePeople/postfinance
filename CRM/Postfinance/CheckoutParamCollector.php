@@ -64,12 +64,17 @@ class CRM_Postfinance_CheckoutParamCollector {
     $contact = civicrm_api('Contact', 'get', array(
       'version' => 3,
       'id' => $params['contactID'],
-      'return' => array('display_name', 'city', 'email', 'postal_code', 'street_address'),
+      'return' => array('display_name', 'country', 'city', 'email', 'postal_code', 'street_address'),
     ));
 
     if (empty($contact['values'][$params['contactID']])) {
       throw new Exception('No contact found for id=' . $params['contactID'] . '.');
     }
+
+    $contact['values'][$params['contactID']]['country_iso'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country',
+        $contact['values'][$params['contactID']]['country_id'],
+        'iso_code'
+      );
 
     return $contact['values'][$params['contactID']];
   }
@@ -109,7 +114,8 @@ class CRM_Postfinance_CheckoutParamCollector {
       'EMAIL' => @$contact['email'],
       'OWNERZIP' => @$contact['postal_code'],
       'OWNERADDRESS' => @$contact['street_address'],
-      'OWNERCTY' => @$contact['city'],
+      'OWNERTOWN' => @$contact['city'],
+      'OWNERCTY' => @$contact['country_iso'],
       // Leave tel no empty for privacy.
       // 'OWNERTELNO' => '',
 
