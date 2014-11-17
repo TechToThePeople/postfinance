@@ -56,21 +56,28 @@ class CRM_Postfinance_IPN {
       // Accept
       $status_id = 1;
       $status_name = 'ACCEPT';
+      $api_params = array(
+        'version' => 3,
+        'id' => $params['orderID'],
+        'field'=>'contribution_status_id',
+        'value' => $status_id
+        // 'cancel_reason' => print_r($params, TRUE),
+      );
+      $api_result = civicrm_api('contribution', 'completetransaction', $api_params);
     }
     else {
       // Reject
       $status_id = 3;
       $status_name = 'REJECT';
+      $api_params = array(
+        'version' => 3,
+        'id' => $params['orderID'],
+        'contribution_status_id' => $status_id,
+        // 'cancel_reason' => print_r($params, TRUE),
+      );
+
+      $api_result = civicrm_api('contribution', 'create', $api_params);
     }
-
-    $api_params = array(
-      'version' => 3,
-      'id' => $params['orderID'],
-      'contribution_status_id' => $status_id,
-      // 'cancel_reason' => print_r($params, TRUE),
-    );
-
-    $api_result = civicrm_api('contribution', 'create', $api_params);
 
     if (!empty($api_result['is_error'])) {
       $print_r_api_result = var_export($api_result, TRUE);
